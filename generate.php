@@ -80,7 +80,16 @@ function get_progress() {
 
 
 $tempdir = getcwd().'/temp/';
+$outputdir = '/output/';
 $progressfile = $tempdir.'progress.txt';
+
+//make our output directories if they dont exist
+if (!file_exists($tempdir)) {
+    mkdir($tempdir, 0777, true);
+}
+if (!file_exists(getcwd().$outputdir)) {
+    mkdir(getcwd().$outputdir, 0777, true);
+}
 
    
 //check if the process is already running
@@ -477,7 +486,7 @@ TPL;
    //GENERATE THE ZIP FILE
    //create zip file
    $zip_filename = "spellicons_".time()."_".$outrows."x".$outcols."_".$out_file_type.".zip";
-   $zip_filepath = "/output/".$zip_filename;
+   $zip_filepath = $outputdir.$zip_filename;
    $zip_filepath_qualified = getcwd().$zip_filepath;
    //delete it if it exists
    if (is_file($zip_filepath_qualified)) unlink($zip_filepath_qualified);

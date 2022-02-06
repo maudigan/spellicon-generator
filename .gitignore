@@ -29,6 +29,8 @@ $RECYCLE.BIN/
 *.lnk
 
 ### custom files ###
+temp/
+output/
 generate.php.pid
 
 ### server files ###
