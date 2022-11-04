@@ -49,6 +49,22 @@ class pid {
    
 }
 
+//simple count function that acts
+// like the one prior to php 7.4
+function count_ez($target)
+{
+   //is_countable added in 7.4 to work with the new version
+   //of count. if it doesnt exist, we can safely use the
+   //old count.
+   if (!function_exists("is_countable")) return count($target);
+   
+   if (is_countable($target)) 
+   {
+      return count_ez($target);
+   }
+   return 0;
+}
+
 
 function formatSeconds($seconds)
 {
