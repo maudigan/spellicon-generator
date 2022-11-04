@@ -60,7 +60,7 @@ function count_ez($target)
    
    if (is_countable($target)) 
    {
-      return count_ez($target);
+      return count($target);
    }
    return 0;
 }
@@ -321,7 +321,7 @@ TPL;
 
    //if we have any voids, report them to the user so they
    //can replace the missing files
-   if ($max_index != count($files))
+   if ($max_index != count_ez($files))
    {
       $textout = "You are missing some spell icon files! Scan the files below and replace the missing file in the ./spelliconsheets/ directory<br/><br/>";
       for ($i = 1; $i <= $max_index; $i++) {
@@ -339,7 +339,7 @@ TPL;
    }
    
    //how many icons we need to process
-   $icon_count_total = count($files) * 36;
+   $icon_count_total = count_ez($files) * 36;
    $icon_count_processed = 0;
    
      
@@ -443,7 +443,7 @@ TPL;
    }
 
    //save how many images we created
-   $out_image_count = count($output_files);
+   $out_image_count = count_ez($output_files);
      
    //output the css file  
    $css_filepath = $tempdir.$css_filename;
