@@ -2,51 +2,51 @@
 //process governor 
 class pid {
 
-    protected $filename;
-    public $already_running = false;
-    public $id = 0;
-   
-    function __construct($directory) {
-       
-        $this->filename = $directory . '/' . basename($_SERVER['PHP_SELF']) . '.pid';
-       
-        if(is_writable($this->filename) || is_writable($directory)) {
-           
-            if(file_exists($this->filename)) {
-                $this->id = (int)trim(file_get_contents($this->filename));
-                if(posix_kill($this->id, 0)) { //check if its running
-                    $this->already_running = true;
-                }
+   protected $filename;
+   public $already_running = false;
+   public $id = 0;
+
+   function __construct($directory) {
+
+      $this->filename = $directory . '/' . basename($_SERVER['PHP_SELF']) . '.pid';
+
+      if(is_writable($this->filename) || is_writable($directory)) {
+
+         if(file_exists($this->filename)) {
+            $this->id = (int)trim(file_get_contents($this->filename));
+            if(posix_kill($this->id, 0)) { //check if its running
+               $this->already_running = true;
             }
-           
-        }
-        else {
-            die("Cannot write to pid file '$this->filename'. Program execution halted.n");
-        }
-       
-        if(!$this->already_running) {
-            $this->id = getmypid();
-            file_put_contents($this->filename, $this->id);
-        }
-       
-    }
-    
-    public function kill() {
+         }
+
+      }
+      else {
+         die("Cannot write to pid file '$this->filename'. Program execution halted.n");
+      }
+
+      if(!$this->already_running) {
+         $this->id = getmypid();
+         file_put_contents($this->filename, $this->id);
+      }
+
+   }
+
+   public function kill() {
       if($this->already_running) {
          posix_kill($this->id, 9); //9 is the halt signal
-   
+
       }
-    }
-    
+   }
 
-    public function __destruct() {
 
-        if(!$this->already_running && file_exists($this->filename) && is_writeable($this->filename)) {
-            unlink($this->filename);
-        }
-   
-    }
-   
+   public function __destruct() {
+
+      if(!$this->already_running && file_exists($this->filename) && is_writeable($this->filename)) {
+         unlink($this->filename);
+      }
+
+   }
+
 }
 
 //simple count function that acts
@@ -57,8 +57,8 @@ function count_ez($target)
    //of count. if it doesnt exist, we can safely use the
    //old count.
    if (!function_exists("is_countable")) return count($target);
-   
-   if (is_countable($target)) 
+
+   if (is_countable($target))
    {
       return count($target);
    }
@@ -68,20 +68,20 @@ function count_ez($target)
 
 function formatSeconds($seconds)
 {
-  $seconds = intval($seconds);
-  $hours = 0;
-  $milliseconds = str_replace( "0.", '', $seconds - floor( $seconds ) );
+   $seconds = intval($seconds);
+   $hours = 0;
+   $milliseconds = str_replace( "0.", '', $seconds - floor( $seconds ) );
 
-  if ( $seconds > 3600 )
-  {
-    $hours = floor( $seconds / 3600 );
-  }
-  $seconds = $seconds % 3600;
-  
-  return str_pad( $hours, 2, '0', STR_PAD_LEFT )
+   if ( $seconds > 3600 )
+   {
+      $hours = floor( $seconds / 3600 );
+   }
+   $seconds = $seconds % 3600;
+
+   return str_pad( $hours, 2, '0', STR_PAD_LEFT )
        . gmdate( ':i:s', $seconds )
        . ($milliseconds ? ".$milliseconds" : '')
-  ;
+       ;
 }
 
 function set_progress($out) {
@@ -101,25 +101,25 @@ $progressfile = $tempdir.'progress.txt';
 
 //make our output directories if they dont exist
 if (!file_exists($tempdir)) {
-    mkdir($tempdir, 0777, true);
+   mkdir($tempdir, 0777, true);
 }
 if (!file_exists(getcwd().$outputdir)) {
-    mkdir(getcwd().$outputdir, 0777, true);
+   mkdir(getcwd().$outputdir, 0777, true);
 }
 
-   
+
 //check if the process is already running
 if ($_REQUEST['process'] === 'isrunning') {
    //check if we're running
    $pid = new pid('.');
-   
+
    if($pid->already_running) {
       exit(json_encode(array('STATUS' => 1, 'RUNNINGPID' => $pid->id, 'MYPID' => getmypid())));
    }
    else {
       exit(json_encode(array('STATUS' => 0, 'RUNNINGPID' => $pid->id, 'MYPID' => getmypid())));
    }
-   
+
 }
 
 //stop the generation process
@@ -132,7 +132,7 @@ elseif ($_REQUEST['process'] === 'killprocess') {
 
 //get the most recent process output
 elseif ($_REQUEST['process'] === 'checkprogress') {
-      exit(get_progress());
+   exit(get_progress());
 }
 
 //get the list of available downloads
@@ -161,10 +161,10 @@ RESPONSE;
 
 elseif ($_REQUEST['process'] === 'generate') {
    set_progress("Started...");
-   
+
    //make sure the script doesn't time out
    @set_time_limit(0);
-   
+
    define("ICON_DIM", 40);
 
    //get the passed parm
@@ -176,12 +176,12 @@ elseif ($_REQUEST['process'] === 'generate') {
          $output = $default;
       }
    }
-   
+
    //force int within a range
    function rangeInt(&$val, $min, $max) {
       $val = max($min, min($max, intval($val)));
    }
-   
+
    //fetch user parameters
    fetchVar($outcols, 'cols', 6);
    fetchVar($outrows, 'rows', 6);
@@ -195,7 +195,7 @@ elseif ($_REQUEST['process'] === 'generate') {
    fetchVar($css_template, 'csstemplate', ".spellicon-{ICON} { background: url('../spellicons/{FILE}') {X}px {Y}px; }");
    fetchVar($out_file_template, 'imagefilename', "spellsprites_{FILENUM}");
    fetchVar($out_file_type, 'filetype', "png");
-   
+
    //validate user input
    rangeInt($outcols, 1, 101);
    rangeInt($outrows, 1, 101);
@@ -210,8 +210,8 @@ elseif ($_REQUEST['process'] === 'generate') {
    if (preg_match('/[^a-z_\-0-9\.\{\}]/i', $out_file_template)) exit("ERROR: Output Images File Name Template contains invalid characters");
    $validExt = array('png', 'gif', 'jpeg');
    if (!in_array($out_file_type, $validExt))  exit("ERROR: Output Images File Type is not valid.");
-   
-   
+
+
    $outputHeader = <<<TPL
 <br><br>
 Output Image: %s x %s<br>
@@ -223,18 +223,18 @@ CSS Template: %s<br>
 TPL;
 
    $outputHeader = sprintf(
-      $outputHeader,
-      $outrows,
-      $outcols,
-      $bgr,
-      $bgg,
-      $bgb,
-      $bga,
-      str_replace("{FILENUM}", $out_first_index, $out_file_template),
-      $out_file_type,
-      $css_filename,
-      $icon_count_first,
-      $css_template
+       $outputHeader,
+       $outrows,
+       $outcols,
+       $bgr,
+       $bgg,
+       $bgb,
+       $bga,
+       str_replace("{FILENUM}", $out_first_index, $out_file_template),
+       $out_file_type,
+       $css_filename,
+       $icon_count_first,
+       $css_template
    );
 
    //DECLARE VARS
@@ -250,22 +250,22 @@ TPL;
    $output_files = array();
    $output_filename_first = 0;
    $thisurl = dirname('http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
-   
+
    //only run 1 at a time of this script
    //if it's already running report the status
    $pid = new pid('.');
    if($pid->already_running) {
       exit(json_encode(array('STATUS' => 1)));
    }
-   
-   
+
+
    set_progress("Scanning spelliconsheets directory for source icons.".$outputHeader);
 
    //figure out which spell icons we are going to process
    //by examining the spelliconsheets directory. We're assuming
    //there isn't a bunch of garbage in the directory
    $files_unsorted = glob('spelliconsheets/*.{tga}', GLOB_BRACE);
-   
+
    /*$files_unsorted = array(
       'spelliconsheets/Spells01.tga',
       'spelliconsheets/Spells02.tga');*/
@@ -280,7 +280,7 @@ TPL;
    foreach ($files_unsorted as $file) {
       preg_match_all('!\d+!', $file, $number);
       $index = $number[0][0];
-      
+
       //if it has an index, add it to new array
       if (is_numeric($index)) {
          $files[$index] = $file;
@@ -291,8 +291,8 @@ TPL;
 
    //make sure its in order
    ksort($files);
-   
-   
+
+
    //sub to save image
    function save_image() {
       global $out_file_type;
@@ -309,7 +309,7 @@ TPL;
       }
       elseif ($out_file_type == 'gif') {
          if ($bga == 127) {
-            imagecolortransparent($out_image, $bgcolor); 
+            imagecolortransparent($out_image, $bgcolor);
          }
          imagegif($out_image, $output_filepath);
       }
@@ -333,16 +333,16 @@ TPL;
             $textout .= "<span style='color:green'>LOCATED</span><br/>";
          }
       }
-      
+
       set_progress($outputHeader.$textout);
       exit(json_encode(array('STATUS' => 0)));
    }
-   
+
    //how many icons we need to process
    $icon_count_total = count_ez($files) * 36;
    $icon_count_processed = 0;
-   
-     
+
+
 
    //PROCESS SPELLICONSHEET FILES INTO NEW IMAGES AND CSS  
    $starttime = time();
@@ -357,10 +357,10 @@ TPL;
          set_progress("Failed to convert $file to $tempfilename.".$outputHeader);
          exit(json_encode(array('STATUS' => 0)));
       }
-      
+
       //open then destroy the converted image
       $sourceimage = imagecreatefrompng($tempfilename);
-      imagesavealpha($sourceimage, true); 
+      imagesavealpha($sourceimage, true);
       unlink($tempfilename);
 
       //loop through the converted image, cutting out each icon
@@ -368,18 +368,18 @@ TPL;
       //calculate the CSS along the way
       for ($source_y = 0; $source_y < 240; $source_y += ICON_DIM) {
          for ($source_x = 0; $source_x < 240; $source_x += ICON_DIM) {
-         
+
             //make sure we have an image to paste to, we create a new one
             //when the old one gets full
             if (!$out_image) {
-               $out_image = imagecreatetruecolor($outwidth, $outheight);   
-               imagesavealpha($out_image, true);    
-               $bgcolor = imagecolorallocatealpha($out_image, $bgr, $bgg, $bgb, $bga);  
-               imagefill($out_image, 0, 0, $bgcolor);  
+               $out_image = imagecreatetruecolor($outwidth, $outheight);
+               imagesavealpha($out_image, true);
+               $bgcolor = imagecolorallocatealpha($out_image, $bgr, $bgg, $bgb, $bga);
+               imagefill($out_image, 0, 0, $bgcolor);
                //if its a gif we dont have an alpha layer
                //so set a palet transparency if they went with 127(full transparent)
                if ($out_file_type == 'gif' && $bga == 127) {
-                  imagecolortransparent($out_image, $bgcolor); 
+                  imagecolortransparent($out_image, $bgcolor);
                }
                $output_filename = str_replace("{FILENUM}", $out_count++, $out_file_template).".".$out_file_type;
                $output_filepath = $tempdir.$output_filename;
@@ -387,54 +387,54 @@ TPL;
 
             //cut from the spell icon and paste to our new sprite sheet
             imagecopy($out_image, $sourceimage, $out_x_pos, $out_y_pos, $source_x, $source_y, ICON_DIM, ICON_DIM);
-            
-            
-            
+
+
+
             $icon_count_processed++;
             //only output updates every 4 seconds (commented out cause it doesn't improve performance)
             //if (time() - $last_output > 24 || $last_output == 0) 
             {
                //$last_output = time();
-               
+
                //estimate time left
                $time_elapsed = time() - $starttime;
                $percent_done = $icon_count_processed/$icon_count_total;
                $percent_done_clean = intval($percent_done*100);
                $time_left = $time_elapsed/$percent_done - $time_elapsed;
-               
-            
+
+
                //mark our progrss in the progress file
                $progress_output = "<div class='progress-bar'><div style='width: $percent_done_clean%;'><span>$percent_done_clean%</span></div></div>";
                $progress_output .= "Progress: ".$icon_count_processed." of ".$icon_count_total." icons processed.<br />";
                $progress_output .= "Time Elapsed: ".formatSeconds($time_elapsed)."<br />";
                $progress_output .= "Time Remaining: ".formatSeconds($time_left)."<br />";
-               
+
                set_progress($progress_output.$outputHeader);
             }
-            
-            
+
+
             //generate the css line for this icon
-            $out_css_line = str_replace(array("{ICON}", "{FILE}", "{X}", "{Y}"), array($icon_count++, $output_filename, $out_x_pos, $out_y_pos), $css_template);
+            $out_css_line = str_replace(array("{ICON}", "{FILE}", "{X}", "{Y}"), array($icon_count++, $output_filename, -$out_x_pos, -$out_y_pos), $css_template);
             $out_css .= $out_css_line."\r\n";
-            
+
             //calculate the new location on our sprite sheet (or start a new one)
             $out_y_pos += ICON_DIM;
             if ($out_y_pos >= $outheight) {
                $out_y_pos = 0;
                $out_x_pos += ICON_DIM;
-               
+
                if ($out_x_pos >= $outwidth) {
                   $out_x_pos = 0;
                   save_image();
                }
             }
          }
-      }   
-      
+      }
+
       //destroy the converted image stored in memory
       ImageDestroy($sourceimage);
    }
-   
+
 
    //we're done looping through all the source files, need to make sure we
    //don't have any lingering output images that weren't done
@@ -444,7 +444,7 @@ TPL;
 
    //save how many images we created
    $out_image_count = count_ez($output_files);
-     
+
    //output the css file  
    $css_filepath = $tempdir.$css_filename;
    file_put_contents($css_filepath, $out_css);
@@ -478,25 +478,25 @@ TPL;
 
    //populate dynamic data into manifest
    $manifest = sprintf(
-      $manifest, 
-      date("F j, Y, g:i a"),
-      str_pad( $min_index, 2, '0', STR_PAD_LEFT ),
-      str_pad( $max_index, 2, '0', STR_PAD_LEFT ),
-      $output_filename_first,
-      $output_filename,
-      $out_image_count,
-      $outrows,
-      $outcols,
-      $outrows * ICON_DIM,
-      $outcols * ICON_DIM,
-      $bgr,
-      $bgg,
-      $bgb,
-      $bga,
-      $icon_count_first,
-      $css_filename
+       $manifest,
+       date("F j, Y, g:i a"),
+       str_pad( $min_index, 2, '0', STR_PAD_LEFT ),
+       str_pad( $max_index, 2, '0', STR_PAD_LEFT ),
+       $output_filename_first,
+       $output_filename,
+       $out_image_count,
+       $outrows,
+       $outcols,
+       $outrows * ICON_DIM,
+       $outcols * ICON_DIM,
+       $bgr,
+       $bgg,
+       $bgb,
+       $bga,
+       $icon_count_first,
+       $css_filename
    );
-      
+
 
 
    //GENERATE THE ZIP FILE
